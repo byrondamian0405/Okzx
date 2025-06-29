@@ -1,0 +1,267 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Phone UI</title>
+  <style>
+    :root {
+      --app-size: 64px;
+      --app-radius: 16px;
+      --transition-speed: 0.5s;
+      --scale-factor: 0.95;
+    }html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: url('https://images.unsplash.com/photo-1566438480900-0609be27a4be?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+  height: 100vh;
+  font-family: sans-serif;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.home-wrapper {
+  transition: transform 0.3s ease;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.home-wrapper.scaled {
+  transform: scale(var(--scale-factor));
+}
+
+.screen {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--app-size), 1fr));
+  gap: 16px;
+  padding: 24px;
+  height: calc(100% - 160px);
+}
+
+.app, .dock-app {
+  width: var(--app-size);
+  height: var(--app-size);
+  border-radius: var(--app-radius);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.app img, .dock-app img {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--app-radius);
+  object-fit: cover;
+}
+
+.expanding {
+  position: fixed !important;
+  object-fit: fill !important;
+  z-index: 9999;
+  transition: top 0.5s ease, left 0.5s ease, width 0.6s ease, height 0.6s ease;
+  pointer-events: none;
+}
+
+.navbar {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 11;
+}
+
+.gesture-pill {
+  width: 100px;
+  height: 18px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.dockbar {
+  position: absolute;
+  bottom: -650px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  display: flex;
+  gap: 20px;
+  padding: 10px 20px;
+  border-radius: 24px;
+  z-index: 10;
+}
+#editScreen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 99999;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: white;
+}
+#editScreen input, #editScreen button {
+  margin: 8px;
+}
+  </style>
+</head>
+<body>
+  <div class="home-wrapper" id="homeWrapper">
+    <div class="screen" id="screenGrid">
+      <div class="app" onclick="expandApp(this)">
+        <img src="https://www.apkmirror.com/wp-content/themes/APKMirror/ap_resize/ap_resize.php?src=https%3A%2F%2Fdownloadr2.apkmirror.com%2Fwp-content%2Fuploads%2F2022%2F10%2F91%2F634da6e3c5037.png&w=384&h=384&q=100" alt="TikTok">
+      </div>
+      <div class="app" onclick="expandApp(this)">
+        <img src="https://www.apkmirror.com/wp-content/themes/APKMirror/ap_resize/ap_resize.php?src=https%3A%2F%2Fdownloadr2.apkmirror.com%2Fwp-content%2Fuploads%2F2023%2F09%2F52%2F6513b13ad4d39_com.facebook.katana.png&w=384&h=384&q=100" alt="Facebook">
+      </div>
+      <div class="app" onclick="expandApp(this)">
+        <img src="https://i1.sndcdn.com/artworks-NHsb0E3h3tkS5fm6-HQ8hMw-t500x500.jpg" alt="Play Store">
+      </div>
+    </div><div class="dockbar">
+  <div class="dock-app" onclick="expandApp(this)">
+    <img src="https://www.apkmirror.com/wp-content/themes/APKMirror/ap_resize/ap_resize.php?src=https%3A%2F%2Fdownloadr2.apkmirror.com%2Fwp-content%2Fuploads%2F2024%2F05%2FPhone_round.png&w=384&h=384&q=100" alt="Phone">
+  </div>
+  <div class="dock-app" onclick="expandApp(this)">
+    <img src="https://www.apkmirror.com/wp-content/themes/APKMirror/ap_resize/ap_resize.php?src=https%3A%2F%2Fdownloadr2.apkmirror.com%2Fwp-content%2Fuploads%2F2025%2F03%2F21%2F67dd446766e28_com.android.mms.png&w=384&h=384&q=100" alt="Messages">
+  </div>
+  <div class="dock-app" onclick="expandApp(this)">
+    <img src="https://www.apkmirror.com/wp-content/themes/APKMirror/ap_resize/ap_resize.php?src=https%3A%2F%2Fdownloadr2.apkmirror.com%2Fwp-content%2Fuploads%2F2020%2F07%2F79%2F5f06abb0c532a.png&w=384&h=384&q=100" alt="Browser">
+  </div>
+  <div class="dock-app" onclick="expandApp(this)">
+    <img src="https://www.apkmirror.com/wp-content/themes/APKMirror/ap_resize/ap_resize.php?src=https%3A%2F%2Fdownloadr2.apkmirror.com%2Fwp-content%2Fuploads%2F2023%2F09%2F04%2F6509f30fb22ed_com.android.camera.png&w=384&h=384&q=100" alt="Camera">
+  </div>
+</div>
+  </div>
+  <div class="navbar">
+    <div class="gesture-pill" id="homeBtn"></div>
+  </div>
+
+  <div id="editScreen">
+    <input type="file" id="uploadAppIcon" accept="image/*">
+    <button onclick="addApp()">Add App</button>
+    <button onclick="exitEdit()">Done</button>
+  </div>
+
+  <script>
+    let current = null;
+    const homeWrapper = document.getElementById('homeWrapper');
+    const screenGrid = document.getElementById('screenGrid');
+
+    function expandApp(el) {
+      const img = el.querySelector('img');
+      if (current && current !== img) closeImmediately(current);
+
+      const rect = img.getBoundingClientRect();
+      current = img;
+      current.__parent = el;
+      current.__rect = rect;
+
+      homeWrapper.classList.add('scaled');
+
+      Object.assign(current.style, {
+        position: 'fixed',
+        top: rect.top + 'px',
+        left: rect.left + 'px',
+        width: rect.width + 'px',
+        height: rect.height + 'px',
+        zIndex: 9999,
+        objectFit: 'fill',
+        borderRadius: '0px',
+        transition: 'top 0.5s ease, left 0.5s ease, width 0.6s ease, height 0.6s ease'
+      });
+
+      current.classList.add('expanding');
+      document.body.appendChild(current);
+
+      requestAnimationFrame(() => {
+        current.style.top = '0';
+        current.style.left = '0';
+        current.style.width = '100vw';
+        current.style.height = '100vh';
+      });
+    }
+
+    function closeImmediately(img) {
+      if (!img || !img.__rect) return;
+      const rect = img.__rect;
+
+      Object.assign(img.style, {
+        top: rect.top + 'px',
+        left: rect.left + 'px',
+        width: rect.width + 'px',
+        height: rect.height + 'px',
+        borderRadius: '16px'
+      });
+
+      img.addEventListener('transitionend', () => {
+        img.removeAttribute('style');
+        img.classList.remove('expanding');
+        img.__parent.appendChild(img);
+        if (current === img) current = null;
+        homeWrapper.classList.remove('scaled');
+      }, { once: true });
+    }
+
+    function homeButton() {
+      if (current) closeImmediately(current);
+    }
+
+    // Swipe gesture
+    let startY = null;
+    let swipeActive = false;
+
+    window.addEventListener('touchstart', e => {
+      const touch = e.touches[0];
+      if (current && touch.clientY > window.innerHeight - 100) {
+        startY = touch.clientY;
+        swipeActive = true;
+      }
+    });
+
+    window.addEventListener('touchmove', e => {
+      if (!swipeActive || !current) return;
+      const touch = e.touches[0];
+      const delta = touch.clientY - startY;
+      if (delta > 0) {
+        current.style.transform = `translateY(${delta}px)`;
+      }
+    });
+
+window.addEventListener('touchend', () => {
+  if (swipeActive && current) {
+    current.style.transform = '';
+    closeImmediately(current);
+  }
+  startY = null;
+  swipeActive = false;
+});  document.getElementById('homeBtn').addEventListener('click', homeButton);
+
+    document.body.addEventListener('contextmenu', e => {
+      e.preventDefault();
+      document.getElementById('editScreen').style.display = 'flex';
+      homeWrapper.classList.add('scaled');
+    });
+
+    function addApp() {
+      const input = document.getElementById('uploadAppIcon');
+      if (!input.files[0]) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const newApp = document.createElement('div');
+        newApp.className = 'app';
+        newApp.innerHTML = `<img src="${e.target.result}">`;
+        newApp.onclick = () => expandApp(newApp);
+        screenGrid.appendChild(newApp);
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+
+    function exitEdit() {
+      document.getElementById('editScreen').style.display = 'none';
+      homeWrapper.classList.remove('scaled');
+    }
+  </script>
+</body>
+</html>
